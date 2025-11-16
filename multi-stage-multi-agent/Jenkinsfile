@@ -6,7 +6,6 @@ pipeline {
             agent {
                 docker {
                     image 'maven:3.9.6-eclipse-temurin-17'
-                    args '-v $PWD:/workspace'
                 }
             }
             steps {
@@ -25,7 +24,7 @@ pipeline {
             steps {
                 dir('multi-stage-multi-agent/node-app') {
                     sh 'npm install'
-                    sh 'npm run build || true'   // safe build
+                    sh 'npm run build || true'
                 }
             }
         }
@@ -38,14 +37,14 @@ pipeline {
                 }
             }
             steps {
-                sh 'echo Building Docker images (optional)...'
+                sh 'echo "Docker stage placeholder..."'
             }
         }
 
         stage('Deploy') {
             agent any
             steps {
-                sh 'echo Deploying...'
+                sh 'echo "Deploy step..."'
             }
         }
     }
