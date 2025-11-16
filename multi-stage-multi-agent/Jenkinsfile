@@ -1,21 +1,53 @@
 pipeline {
-  agent none
-  stages {
-    stage('Back-end') {
-      agent {
-        docker { image 'maven:3.8.1-adoptopenjdk-11' }
-      }
-      steps {
-        sh 'mvn --version'
-      }
+    agent none
+
+    stages {
+        stage('Build Java App') {
+            agent {
+                docker {
+                    image 'maven:3.9.6-eclipse-temurin-17'
+                    args '-v $PWD:/workspace'
+                }
+            }
+            steps {
+                dir('java-app') {
+                    sh 'mvn clean package -DskipTests'
+                    sh 'mvn install -DskipTests'
+                }
+            }
+        }
+
+        stage('Build Node App') {
+            agent {
+                docker {
+                    image 'node:18'
+                }
+            }
+            steps {
+                dir('node-app') {
+                    sh 'npm install'
+                    sh 'npm run build'
+                }
+            }
+        }
+
+        stage('Docker Build & Push') {
+            agent {
+                docker {
+                    image 'docker:27'
+                    args '-v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
+            steps {
+                sh 'echo "Build docker images for both apps (optional)"'
+            }
+        }
+
+        stage('Deploy') {
+            agent any
+            steps {
+                sh 'echo "Deploy step here"'
+            }
+        }
     }
-    stage('Front-end') {
-      agent {
-        docker { image 'node:16-alpine' }
-      }
-      steps {
-        sh 'node --version'
-      }
-    }
-  }
 }
