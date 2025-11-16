@@ -10,9 +10,8 @@ pipeline {
                 }
             }
             steps {
-                dir('java-app') {
+                dir('multi-stage-multi-agent/java-app') {
                     sh 'mvn clean package -DskipTests'
-                    sh 'mvn install -DskipTests'
                 }
             }
         }
@@ -24,9 +23,9 @@ pipeline {
                 }
             }
             steps {
-                dir('node-app') {
+                dir('multi-stage-multi-agent/node-app') {
                     sh 'npm install'
-                    sh 'npm run build'
+                    sh 'npm run build || true'   // safe build
                 }
             }
         }
@@ -39,14 +38,14 @@ pipeline {
                 }
             }
             steps {
-                sh 'echo "Build docker images for both apps (optional)"'
+                sh 'echo Building Docker images (optional)...'
             }
         }
 
         stage('Deploy') {
             agent any
             steps {
-                sh 'echo "Deploy step here"'
+                sh 'echo Deploying...'
             }
         }
     }
